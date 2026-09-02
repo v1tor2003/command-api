@@ -22,9 +22,7 @@ export async function executeMiddlewarePipeline<TOutput>(
   target: () => Promise<unknown>,
 ): Promise<TOutput> {
   function dispatch(index: number): Promise<unknown> {
-    if (index === middlewares.length) {
-      return target();
-    }
+    if (index === middlewares.length) return target();
 
     const middleware = middlewares[index];
     return middleware(context, () => dispatch(index + 1), command as BaseRequest<unknown, unknown>);

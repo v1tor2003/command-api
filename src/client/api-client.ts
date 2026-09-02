@@ -3,6 +3,7 @@ import { LoggerService } from '@/logger/default-logger';
 import type { Middleware } from '@/middleware/middleware.interface';
 import { executeMiddlewarePipeline } from '@/middleware/pipeline';
 import type { ITransport } from '@/transport/transport.interface';
+import type { HttpRequestContext } from '@/types/http';
 import type { LogFormatter, LoggerOptions } from '@/types/logger';
 import { type Result, err, ok } from '@/types/result';
 
@@ -31,22 +32,6 @@ export interface ApiClientOptions {
  *
  * Implements the Command Pattern, returning Go/Rust-style {@link Result} discriminated unions
  * that never throw unhandled promise rejections.
- *
- * @example
- * ```typescript
- * const api = new ApiClient({
- *   transport: new FetchTransport('https://api.example.com'),
- *   logging: true,
- *   middleware: [authMiddleware],
- * });
- *
- * const { data, error } = await api.send(new GetUserCommand({ id: '123' }));
- * if (error) {
- *   console.error(error.message);
- *   return;
- * }
- * console.log(data.name);
- * ```
  */
 export class ApiClient {
   private readonly transport: ITransport;
@@ -65,12 +50,7 @@ export class ApiClient {
       this.middlewares.push(...options.middleware);
     }
 
-    const loggerConfig: LoggerOptions =
-      typeof options.logging === 'boolean'
-        ? { enabled: options.logging }
-        : (options.logging ?? { enabled: false });
-
-    this.logger = new LoggerService(loggerConfig);
+    this.logger = new LoggerService(normalizeLoggerOptions(options.logging));
   }
 
   /**
@@ -116,8 +96,6 @@ export class ApiClient {
   /**
    * Dispatches an encapsulated {@link BaseRequest} command across the middleware pipeline and transport layer.
    *
-   * Resolves to a {@link Result} discriminated union, preventing unhandled promise rejections.
-   *
    * @typeParam TInput - The command's input type.
    * @typeParam TOutput - Inferred return type strictly bound from the command's phantom `_outputType`.
    * @param command - The command instance to dispatch.
@@ -130,42 +108,93 @@ export class ApiClient {
     const httpContext = command.toHttp();
 
     try {
-      const rawResponse = await executeMiddlewarePipeline<unknown>(
-        this.middlewares,
-        httpContext,
-        command as BaseRequest<unknown, TOutput>,
-        () => this.transport.send(httpContext),
-      );
-
-      const transformedData: TOutput = command.transformResponse
-        ? command.transformResponse(rawResponse)
-        : (rawResponse as TOutput);
-
-      const durationMs = performance.now() - startTime;
-      this.logger.log({
-        command: command.commandName,
-        method: httpContext.method,
-        path: httpContext.path,
-        durationMs,
-        payload: httpContext.body,
-        response: transformedData,
-      });
-
-      return ok(transformedData);
+      const rawResponse = await this.dispatchPipeline(command, httpContext);
+      return this.handleSuccess(command, httpContext, rawResponse, startTime);
     } catch (caughtError) {
-      const durationMs = performance.now() - startTime;
-      const error = caughtError instanceof Error ? caughtError : new Error(String(caughtError));
-
-      this.logger.log({
-        command: command.commandName,
-        method: httpContext.method,
-        path: httpContext.path,
-        durationMs,
-        payload: httpContext.body,
-        error,
-      });
-
-      return err(error);
+      return this.handleFailure(command, httpContext, caughtError, startTime);
     }
   }
+
+  /**
+   * Executes the middleware pipeline with the transport call at the core.
+   */
+  private dispatchPipeline<TInput, TOutput>(
+    command: BaseRequest<TInput, TOutput>,
+    httpContext: HttpRequestContext,
+  ): Promise<unknown> {
+    return executeMiddlewarePipeline<unknown>(
+      this.middlewares,
+      httpContext,
+      command as BaseRequest<unknown, TOutput>,
+      () => this.transport.send(httpContext),
+    );
+  }
+
+  /**
+   * Handles successful response transformation, logs execution, and constructs the ok Result.
+   */
+  private handleSuccess<TInput, TOutput>(
+    command: BaseRequest<TInput, TOutput>,
+    httpContext: HttpRequestContext,
+    rawResponse: unknown,
+    startTime: number,
+  ): Result<TOutput, never> {
+    const transformedData: TOutput = command.transformResponse
+      ? command.transformResponse(rawResponse)
+      : (rawResponse as TOutput);
+
+    const durationMs = performance.now() - startTime;
+    this.logger.log({
+      command: command.commandName,
+      method: httpContext.method,
+      path: httpContext.path,
+      durationMs,
+      payload: httpContext.body,
+      response: transformedData,
+    });
+
+    return ok(transformedData);
+  }
+
+  /**
+   * Normalizes failure, logs error diagnostics, and constructs the err Result.
+   */
+  private handleFailure<TInput, TOutput>(
+    command: BaseRequest<TInput, TOutput>,
+    httpContext: HttpRequestContext,
+    caughtError: unknown,
+    startTime: number,
+  ): Result<never, Error> {
+    const durationMs = performance.now() - startTime;
+    const error = normalizeError(caughtError);
+
+    this.logger.log({
+      command: command.commandName,
+      method: httpContext.method,
+      path: httpContext.path,
+      durationMs,
+      payload: httpContext.body,
+      error,
+    });
+
+    return err(error);
+  }
+}
+
+/**
+ * Normalizes boolean or object logger configuration into a standard LoggerOptions object.
+ */
+function normalizeLoggerOptions(logging?: LoggerOptions | boolean): LoggerOptions {
+  if (typeof logging === 'boolean') {
+    return { enabled: logging };
+  }
+  return logging ?? { enabled: false };
+}
+
+/**
+ * Ensures caught exceptions are instances of Error.
+ */
+function normalizeError(caught: unknown): Error {
+  if (caught instanceof Error) return caught;
+  return new Error(String(caught));
 }
