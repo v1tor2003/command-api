@@ -1,17 +1,49 @@
 import type { ITransport } from '@/transport/transport.interface';
 import { HttpError, type HttpRequestContext } from '@/types/http';
 
+/**
+ * Configuration options for initializing {@link FetchTransport}.
+ */
 export interface FetchTransportOptions {
+  /**
+   * Base URL to prepend to relative command paths (e.g. `'https://api.example.com'`).
+   * Can be omitted if commands supply fully qualified URLs.
+   */
   baseUrl?: string;
+
+  /**
+   * Default headers to attach to every outgoing request (e.g., `'Accept'`, `'User-Agent'`).
+   */
   headers?: Record<string, string>;
+
+  /**
+   * Custom `fetch` implementation to override the global environment fetch (useful for Node testing or polyfills).
+   * @defaultValue `globalThis.fetch`
+   */
   fetch?: typeof fetch;
 }
 
+/**
+ * Zero-dependency HTTP transport implementing {@link ITransport} via the standard Web Fetch API.
+ *
+ * Handles query string serialization, automatic JSON body encoding, and non-2xx {@link HttpError} throwing.
+ *
+ * @example
+ * ```typescript
+ * const transport = new FetchTransport('https://api.example.com');
+ * const data = await transport.send({ method: 'GET', path: '/users' });
+ * ```
+ */
 export class FetchTransport implements ITransport {
   private readonly baseUrl: string;
   private readonly defaultHeaders: Record<string, string>;
   private readonly customFetch: typeof fetch;
 
+  /**
+   * Initializes a new instance of {@link FetchTransport}.
+   *
+   * @param options - Configuration options or a base URL string.
+   */
   constructor(options: FetchTransportOptions | string = {}) {
     if (typeof options === 'string') {
       this.baseUrl = options;
@@ -24,6 +56,14 @@ export class FetchTransport implements ITransport {
     }
   }
 
+  /**
+   * Sends an HTTP request utilizing native `fetch`.
+   *
+   * @typeParam T - Expected return data type.
+   * @param ctx - The {@link HttpRequestContext} defining the request.
+   * @returns A promise resolving to the parsed response payload.
+   * @throws {@link HttpError} if response status is outside the 2xx range.
+   */
   async send<T = unknown>(ctx: HttpRequestContext): Promise<T> {
     const url = this.buildUrl(ctx.path, ctx.query);
     const headers = new Headers(this.defaultHeaders);
@@ -77,6 +117,9 @@ export class FetchTransport implements ITransport {
     return (await this.parseResponseBody(response)) as T;
   }
 
+  /**
+   * Resolves target URL by combining base URL, relative path, and serialized query parameters.
+   */
   private buildUrl(path: string, query?: HttpRequestContext['query']): string {
     const isAbsolute = /^https?:\/\//i.test(path);
     let fullUrl = path;
@@ -111,6 +154,9 @@ export class FetchTransport implements ITransport {
     return isAbsolute || this.baseUrl ? urlObj.toString() : `${urlObj.pathname}${urlObj.search}`;
   }
 
+  /**
+   * Safely parses response body into JSON or raw text.
+   */
   private async parseResponseBody(response: Response): Promise<unknown> {
     const contentType = response.headers.get('content-type') ?? '';
     const text = await response.text();

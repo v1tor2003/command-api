@@ -1,3 +1,10 @@
+/**
+ * A lightweight, zero-dependency, transport-agnostic TypeScript client library
+ * implementing the Command Pattern (In/Out) for HTTP/REST APIs.
+ *
+ * @packageDocumentation
+ */
+
 // Types & Primitives
 export { type Result, ok, err, isOk, isErr } from '@/types/result';
 export {
