@@ -19,6 +19,18 @@
     }
   },
   "files": ["dist", "README.md"],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/v1tor2003/command-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/v1tor2003/command-api/issues"
+  },
+  "homepage": "https://github.com/v1tor2003/command-api#readme",
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
