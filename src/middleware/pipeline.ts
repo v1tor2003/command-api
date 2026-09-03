@@ -105,8 +105,3 @@ export class MiddlewarePipeline {
     return (await dispatch(0)) as TOutput;
   }
 }
-
-/**
- * Functional alias for {@link MiddlewarePipeline.exec}.
- */
-export const executeMiddlewarePipeline = MiddlewarePipeline.exec;
