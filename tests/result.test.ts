@@ -10,9 +10,7 @@ describe('Result Discriminated Union', () => {
     expect(isOk(res)).toBe(true);
     expect(isErr(res)).toBe(false);
 
-    if (isOk(res)) {
-      expect(res.data.name).toBe('Alice');
-    }
+    if (isOk(res)) expect(res.data.name).toBe('Alice');
   });
 
   it('creates an error result with err()', () => {
@@ -24,17 +22,12 @@ describe('Result Discriminated Union', () => {
     expect(isOk(res)).toBe(false);
     expect(isErr(res)).toBe(true);
 
-    if (isErr(res)) {
-      expect(res.error.message).toBe('Network timeout');
-    }
+    if (isErr(res)) expect(res.error.message).toBe('Network timeout');
   });
 
   it('correctly discriminates result union in branch checks', () => {
     function processResult(res: Result<string>): string {
-      if (res.error) {
-        return `Error: ${res.error.message}`;
-      }
-      return `Success: ${res.data}`;
+      return res.error ? `Error: ${res.error.message}` : `Success: ${res.data}`;
     }
 
     expect(processResult(ok('done'))).toBe('Success: done');

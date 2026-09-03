@@ -1,18 +1,7 @@
-import { BaseRequest } from '@/command/base-request';
 import type { Middleware } from '@/middleware/middleware.interface';
 import { executeMiddlewarePipeline } from '@/middleware/pipeline';
-import type { HttpRequestContext } from '@/types/http';
 import { describe, expect, it } from 'vitest';
-
-class MockCommand extends BaseRequest<{ query: string }, { result: string }> {
-  toHttp(): HttpRequestContext {
-    return {
-      method: 'GET',
-      path: '/search',
-      headers: {},
-    };
-  }
-}
+import { MockCommand } from './fixtures/test.command';
 
 describe('Middleware Pipeline', () => {
   it('executes middlewares in strict onion order', async () => {
