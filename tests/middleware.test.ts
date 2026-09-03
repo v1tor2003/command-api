@@ -76,9 +76,7 @@ describe('Middleware Pipeline', () => {
       command,
       async () => {
         attempts += 1;
-        if (attempts === 1) {
-          throw new Error('Temporary network glitch');
-        }
+        if (attempts === 1) throw new Error('Temporary network glitch');
         return { result: 'recovered' };
       },
     );

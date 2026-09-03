@@ -6,9 +6,11 @@ describe('Root Package Exports', () => {
     expect(CommandApi.ApiClient).toBeDefined();
     expect(CommandApi.BaseRequest).toBeDefined();
     expect(CommandApi.FetchTransport).toBeDefined();
+    expect(CommandApi.HttpUrlBuilder).toBeDefined();
+    expect(CommandApi.HttpResponseHandler).toBeDefined();
+    expect(CommandApi.HttpPayloadResolver).toBeDefined();
     expect(CommandApi.HttpError).toBeDefined();
     expect(CommandApi.LoggerService).toBeDefined();
-    expect(CommandApi.defaultLogFormatter).toBeDefined();
     expect(CommandApi.ok).toBeDefined();
     expect(CommandApi.err).toBeDefined();
     expect(CommandApi.isOk).toBeDefined();

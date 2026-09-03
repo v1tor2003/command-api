@@ -46,9 +46,7 @@ export class ApiClient {
   constructor(options: ApiClientOptions) {
     this.transport = options.transport;
 
-    if (options.middleware) {
-      this.middlewares.push(...options.middleware);
-    }
+    if (options.middleware) this.middlewares.push(...options.middleware);
 
     this.logger = new LoggerService(normalizeLoggerOptions(options.logging));
   }
@@ -88,6 +86,8 @@ export class ApiClient {
 
   /**
    * Retrieves the configured transport layer instance.
+   *
+   * @returns The underlying {@link ITransport} instance.
    */
   public getTransport(): ITransport {
     return this.transport;
@@ -183,16 +183,20 @@ export class ApiClient {
 
 /**
  * Normalizes boolean or object logger configuration into a standard LoggerOptions object.
+ *
+ * @param logging - Input boolean or LoggerOptions configuration.
+ * @returns Standardized {@link LoggerOptions}.
  */
 function normalizeLoggerOptions(logging?: LoggerOptions | boolean): LoggerOptions {
-  if (typeof logging === 'boolean') {
-    return { enabled: logging };
-  }
+  if (typeof logging === 'boolean') return { enabled: logging };
   return logging ?? { enabled: false };
 }
 
 /**
  * Ensures caught exceptions are instances of Error.
+ *
+ * @param caught - Unknown caught rejection reason or exception.
+ * @returns A normalized standard {@link Error} instance.
  */
 function normalizeError(caught: unknown): Error {
   if (caught instanceof Error) return caught;
