@@ -89,6 +89,6 @@ console.log(data.id);
 
 - **Dual ESM/CJS Output**: Build with `tsup` targeting both `import` and `require`.
 - **Sub-path Exports**:
-  - Package root: `@your-scope/command-api` (Core client, commands, interfaces).
-  - Subpaths: `@your-scope/command-api/fetch`, `@your-scope/command-api/axios` (Optional pre-bundled adapters).
+  - Package root: `@v1tor2003/command-api` (Core client, commands, interfaces).
+  - Subpaths: `@v1tor2003/command-api/fetch`, `@v1tor2003/command-api/axios` (Optional pre-bundled adapters).
 - **Bundle Budget**: Core bundle size target < 2 KB minified + gzipped.
