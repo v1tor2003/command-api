@@ -1,58 +1,15 @@
-import { BaseRequest } from '@/command/base-request';
-import type { HttpRequestContext } from '@/types/http';
 import { describe, expect, it } from 'vitest';
-
-interface CreateUserInput {
-  name: string;
-  email: string;
-}
-
-interface UserResponse {
-  id: string;
-  name: string;
-  email: string;
-}
-
-class CreateUserCommand extends BaseRequest<CreateUserInput, UserResponse> {
-  toHttp(): HttpRequestContext {
-    return {
-      method: 'POST',
-      path: '/users',
-      body: this.input,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-  }
-
-  transformResponse(raw: unknown): UserResponse {
-    const data = raw as Record<string, unknown>;
-    return {
-      id: String(data.id),
-      name: String(data.name).trim(),
-      email: String(data.email).toLowerCase(),
-    };
-  }
-}
-
-class SimpleGetCommand extends BaseRequest<void, string> {
-  toHttp(): HttpRequestContext {
-    return {
-      method: 'GET',
-      path: '/status',
-    };
-  }
-}
+import { CreateUserProfileCommand, SimpleGetCommand } from './fixtures/test.command';
 
 describe('BaseRequest Contract', () => {
   it('encapsulates input parameters and translates to HttpRequestContext', () => {
-    const cmd = new CreateUserCommand({ name: 'Alice', email: 'Alice@Example.com' });
+    const cmd = new CreateUserProfileCommand({ bio: 'Software Engineer', avatar: 'avatar.jpg' });
 
-    expect(cmd.commandName).toBe('CreateUserCommand');
+    expect(cmd.commandName).toBe('CreateUserProfileCommand');
     expect(cmd.toHttp()).toEqual({
       method: 'POST',
-      path: '/users',
-      body: { name: 'Alice', email: 'Alice@Example.com' },
+      path: '/users/{userId}/profile',
+      body: { bio: 'Software Engineer', avatar: 'avatar.jpg' },
       headers: {
         'Content-Type': 'application/json',
       },
@@ -60,17 +17,19 @@ describe('BaseRequest Contract', () => {
   });
 
   it('supports transformResponse hook for data transformation/validation', () => {
-    const cmd = new CreateUserCommand({ name: 'Alice', email: 'Alice@Example.com' });
+    const cmd = new CreateUserProfileCommand({ bio: 'Software Engineer', avatar: 'avatar.jpg' });
     const transformed = cmd.transformResponse?.({
       id: 101,
-      name: '  Alice  ',
-      email: 'ALICE@EXAMPLE.COM',
+      userId: 'user123',
+      bio: '  Software Engineer  ',
+      avatar: 'AVATAR.JPG',
     });
 
     expect(transformed).toEqual({
       id: '101',
-      name: 'Alice',
-      email: 'alice@example.com',
+      userId: 'user123',
+      bio: 'Software Engineer',
+      avatar: 'avatar.jpg',
     });
   });
 

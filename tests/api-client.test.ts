@@ -1,31 +1,9 @@
 import { ApiClient } from '@/client/api-client';
-import { BaseRequest } from '@/command/base-request';
 import type { Middleware } from '@/middleware/middleware.interface';
 import { FetchTransport } from '@/transport/fetch-transport';
 import type { ITransport } from '@/transport/transport.interface';
-import type { HttpRequestContext } from '@/types/http';
 import { describe, expect, it, vi } from 'vitest';
-
-interface CreateUserInput {
-  name: string;
-  email: string;
-}
-
-interface UserResponse {
-  id: string;
-  name: string;
-  createdAt: string;
-}
-
-class CreateUserCommand extends BaseRequest<CreateUserInput, UserResponse> {
-  toHttp(): HttpRequestContext {
-    return {
-      method: 'POST',
-      path: '/users',
-      body: this.input,
-    };
-  }
-}
+import { CreateUserCommand } from './fixtures/test.command';
 
 describe('ApiClient DX Integration', () => {
   it('dispatches command and returns { data, error: null } on success', async () => {
