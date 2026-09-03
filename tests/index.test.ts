@@ -15,6 +15,7 @@ describe('Root Package Exports', () => {
     expect(CommandApi.err).toBeDefined();
     expect(CommandApi.isOk).toBeDefined();
     expect(CommandApi.isErr).toBeDefined();
+    expect(CommandApi.MiddlewarePipeline).toBeDefined();
     expect(CommandApi.executeMiddlewarePipeline).toBeDefined();
   });
 });

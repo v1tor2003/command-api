@@ -26,13 +26,8 @@ export class HttpResponseHandler {
    * @throws {@link HttpError} if `response.ok` is `false`.
    */
   public async handle<T = unknown>(response: Response): Promise<T> {
-    if (!response.ok) {
-      await this.throwHttpError(response);
-    }
-
-    if (this.isNoContent(response.status)) {
-      return undefined as T;
-    }
+    if (!response.ok) await this.throwHttpError(response);
+    if (this.isNoContent(response.status)) return undefined as T;
 
     return (await this.parseBody(response)) as T;
   }

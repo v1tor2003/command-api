@@ -28,7 +28,7 @@ export { HttpPayloadResolver } from '@/transport/payload-resolver';
 
 // Middleware Pipeline
 export type { Middleware, NextFn } from '@/middleware/middleware.interface';
-export { executeMiddlewarePipeline } from '@/middleware/pipeline';
+export { MiddlewarePipeline, executeMiddlewarePipeline } from '@/middleware/pipeline';
 
 // Observability & Logger
 export { LoggerService } from '@/logger/default-logger';

@@ -1,7 +1,7 @@
 import type { BaseRequest } from '@/command/base-request';
 import { LoggerService } from '@/logger/default-logger';
 import type { Middleware } from '@/middleware/middleware.interface';
-import { executeMiddlewarePipeline } from '@/middleware/pipeline';
+import { MiddlewarePipeline } from '@/middleware/pipeline';
 import type { ITransport } from '@/transport/transport.interface';
 import type { HttpRequestContext } from '@/types/http';
 import type { LogFormatter, LoggerOptions } from '@/types/logger';
@@ -35,7 +35,7 @@ export interface ApiClientOptions {
  */
 export class ApiClient {
   private readonly transport: ITransport;
-  private readonly middlewares: Middleware[] = [];
+  private readonly pipeline: MiddlewarePipeline;
   private readonly logger: LoggerService;
 
   /**
@@ -45,9 +45,7 @@ export class ApiClient {
    */
   constructor(options: ApiClientOptions) {
     this.transport = options.transport;
-
-    if (options.middleware) this.middlewares.push(...options.middleware);
-
+    this.pipeline = new MiddlewarePipeline(options.middleware);
     this.logger = new LoggerService(normalizeLoggerOptions(options.logging));
   }
 
@@ -58,7 +56,7 @@ export class ApiClient {
    * @returns `this` for fluent chaining.
    */
   public use(middleware: Middleware): this {
-    this.middlewares.push(middleware);
+    this.pipeline.use(middleware);
     return this;
   }
 
@@ -94,6 +92,15 @@ export class ApiClient {
   }
 
   /**
+   * Retrieves the client's internal middleware pipeline.
+   *
+   * @returns The underlying {@link MiddlewarePipeline} instance.
+   */
+  public getPipeline(): MiddlewarePipeline {
+    return this.pipeline;
+  }
+
+  /**
    * Dispatches an encapsulated {@link BaseRequest} command across the middleware pipeline and transport layer.
    *
    * @typeParam TInput - The command's input type.
@@ -122,12 +129,7 @@ export class ApiClient {
     command: BaseRequest<TInput, TOutput>,
     httpContext: HttpRequestContext,
   ): Promise<unknown> {
-    return executeMiddlewarePipeline<unknown>(
-      this.middlewares,
-      httpContext,
-      command as BaseRequest<unknown, TOutput>,
-      () => this.transport.send(httpContext),
-    );
+    return this.pipeline.execute(httpContext, command, () => this.transport.send(httpContext));
   }
 
   /**
