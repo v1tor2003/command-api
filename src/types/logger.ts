@@ -49,7 +49,7 @@ export interface LoggerOptions {
 
   /**
    * Custom log formatter function.
-   * @defaultValue {@link defaultLogFormatter}
+   * @defaultValue {@link LoggerService.defaultFormatter}
    */
   formatter?: LogFormatter;
 }

@@ -30,7 +30,7 @@ export interface ApiClientOptions {
 /**
  * Central API Client dispatcher that executes commands through the configured transport and middleware pipeline.
  *
- * Implements the Command Pattern (In -> Out), returning Go/Rust-style {@link Result} discriminated unions
+ * Implements the Command Pattern (In -\> Out), returning Go/Rust-style {@link Result} discriminated unions
  * that never throw unhandled promise rejections.
  *
  * @example
@@ -262,7 +262,7 @@ export class ApiClient {
    * Ensures caught exceptions or rejection values are converted to standard Error instances.
    *
    * @param caught - Unknown caught rejection reason or exception.
-   * @returns A normalized standard {@link Error} instance.
+   * @returns A normalized standard `Error` instance.
    */
   private static normalizeError(caught: unknown): Error {
     if (caught instanceof Error) return caught;
