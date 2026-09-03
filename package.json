@@ -1,6 +1,6 @@
 {
   "name": "@v1tor2003/command-api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A lightweight, zero-dependency, transport-agnostic TypeScript client library that implements the Command Pattern for HTTP/REST APIs.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -18,7 +18,7 @@
       }
     }
   },
-  "files": ["dist", "README.md"],
+  "files": ["dist", "README.md", "LICENSE"],
   "publishConfig": {
     "access": "public",
     "provenance": true
