@@ -1,4 +1,4 @@
-import { LoggerService, defaultLogFormatter } from '@/logger/default-logger';
+import { LoggerService } from '@/logger/default-logger';
 import type { LogEntry } from '@/types/logger';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -12,7 +12,7 @@ describe('LoggerService & Observability', () => {
       response: { id: 1 },
     };
 
-    const formatted = defaultLogFormatter(entry);
+    const formatted = LoggerService.defaultFormatter(entry);
     expect(formatted).toBe('[GetUserCommand] GET /users/1 - 42.12ms (SUCCESS)');
   });
 
@@ -25,7 +25,7 @@ describe('LoggerService & Observability', () => {
       error: new Error('Validation failed'),
     };
 
-    const formatted = defaultLogFormatter(entry);
+    const formatted = LoggerService.defaultFormatter(entry);
     expect(formatted).toBe('[CreateUserCommand] POST /users - 15.60ms (ERROR: Validation failed)');
   });
 

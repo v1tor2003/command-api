@@ -22,13 +22,16 @@ export { BaseRequest } from '@/command/base-request';
 // Transport Layer
 export type { ITransport } from '@/transport/transport.interface';
 export { FetchTransport, type FetchTransportOptions } from '@/transport/fetch-transport';
+export { HttpUrlBuilder } from '@/transport/url-builder';
+export { HttpResponseHandler } from '@/transport/response-handler';
+export { HttpPayloadResolver } from '@/transport/payload-resolver';
 
 // Middleware Pipeline
 export type { Middleware, NextFn } from '@/middleware/middleware.interface';
-export { executeMiddlewarePipeline } from '@/middleware/pipeline';
+export { MiddlewarePipeline } from '@/middleware/pipeline';
 
 // Observability & Logger
-export { LoggerService, defaultLogFormatter } from '@/logger/default-logger';
+export { LoggerService } from '@/logger/default-logger';
 
 // Core Client Dispatcher
 export { ApiClient, type ApiClientOptions } from '@/client/api-client';
