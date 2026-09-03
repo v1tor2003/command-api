@@ -1,7 +1,7 @@
 import type { HttpRequestContext } from '@/types/http';
 
 /**
- * Generic abstract class defining the Command Contract in the Command Pattern (In -> Out).
+ * Generic abstract class defining the Command Contract in the Command Pattern (In -\> Out).
  *
  * Each concrete command encapsulates its input parameters, translates them to an HTTP request context,
  * and binds a strictly typed return value.

@@ -11,6 +11,7 @@ export {
   type HttpMethod,
   type HttpRequestContext,
   type HttpQueryParams,
+  type QueryParamValue,
   type HttpHeaders,
   HttpError,
 } from '@/types/http';

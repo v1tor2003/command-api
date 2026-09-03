@@ -70,7 +70,7 @@ export class LoggerService {
    * Formats the status label for the default log line.
    *
    * @param error - Optional error instance associated with the log entry.
-   * @returns Formatted status string (`'SUCCESS'` or `'ERROR: <message>'`).
+   * @returns Formatted status string (`'SUCCESS'` or `'ERROR: [message]'`).
    */
   public static formatStatus(error?: Error): string {
     return error ? `ERROR: ${error.message}` : 'SUCCESS';
