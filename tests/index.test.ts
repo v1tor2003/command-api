@@ -11,10 +11,10 @@ describe('Root Package Exports', () => {
     expect(CommandApi.HttpPayloadResolver).toBeDefined();
     expect(CommandApi.HttpError).toBeDefined();
     expect(CommandApi.LoggerService).toBeDefined();
+    expect(CommandApi.MiddlewarePipeline).toBeDefined();
     expect(CommandApi.ok).toBeDefined();
     expect(CommandApi.err).toBeDefined();
     expect(CommandApi.isOk).toBeDefined();
     expect(CommandApi.isErr).toBeDefined();
-    expect(CommandApi.MiddlewarePipeline).toBeDefined();
   });
 });

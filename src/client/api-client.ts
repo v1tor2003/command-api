@@ -143,7 +143,7 @@ export class ApiClient {
    *
    * @example
    * ```typescript
-   * const { data, error } = await api.send(new CreateUserCommand({ name: 'Alice' }));
+   * const { data, error } = await api.send(new BaseCommand({ ... }));
    * if (error) {
    *   console.error(error.message);
    *   return;

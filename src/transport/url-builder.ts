@@ -70,25 +70,11 @@ export class HttpUrlBuilder {
     for (const [key, val] of Object.entries(query)) {
       if (val === undefined || val === null) continue;
 
-      if (Array.isArray(val)) {
-        this.appendArrayQueryParam(url, key, val);
-      } else {
-        url.searchParams.append(key, String(val));
-      }
-    }
-  }
-
-  /**
-   * Appends an array of values under a single query parameter key.
-   *
-   * @param url - The URL object to modify.
-   * @param key - The query parameter key.
-   * @param values - The array of values to append.
-   */
-  private appendArrayQueryParam(url: URL, key: string, values: unknown[]): void {
-    for (const item of values) {
-      if (item !== undefined && item !== null) {
-        url.searchParams.append(key, String(item));
+      const items = Array.isArray(val) ? val : [val];
+      for (const item of items) {
+        if (item !== undefined && item !== null) {
+          url.searchParams.append(key, String(item));
+        }
       }
     }
   }
